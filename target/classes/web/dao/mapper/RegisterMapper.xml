@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="web.dao.face.RegisterProductDao">
+
+	<resultMap type="web.dto.Product" id="Product">
+		<id property="regNo" column="reg_no" />
+		<result property="tradeClass" column="trade_class" />
+		<result property="userEmail" column="user_email" />
+		<result property="regDate" column="reg_date" />
+	</resultMap>
+	
+	<resultMap type="file.dto.Filetest" id="FileTest">
+		<id property="file_no" column="file_no"/>
+		<result property="reg_no" column="reg_no"/>
+		<result property="originName" column="origin_name"/>
+		<result property="storedName" column="stored_name"/>
+		<result property="filePath" column="file_path"/>
+		<result property="fileKind" column="file_kind"/>
+	</resultMap>
+
+	<sql id="selectBoard">
+		SELECT
+		reg_no
+		, trade_class
+		, category
+		, price
+		, title
+		, content
+		, quantity
+		, user_email
+		, location
+		, reg_date
+		FROM Product
+	</sql>
+
+	<sql id="whereTitle">
+		where title LIKE '%'||#{search}||'%'
+	</sql>
+
+	<sql id="selectBoardWithRecommend">
+		SELECT
+		reg_no
+		, title
+		, user_email
+		, content
+		, hit
+		, reg_date
+		, price
+		, quantity
+		, category
+		, location
+		, trade_class
+		, (SELECT count(*) FROM recommend R WHERE R.regno=B.reg_no) AS
+		recommend
+		FROM Product B
+	</sql>
+
+
+	<select id="checklistMap"
+		parameterType="hashmap" resultMap="Product">
+
+		SELECT * FROM (
+		SELECT rownum rnum, A.* FROM (
+		<include refid="selectBoard" />
+		<where>
+			<trim prefixOverrides="AND">
+				<if test="location != null and location !=''">
+					<foreach open="AND location LIKE " collection="location"
+						item="location" separator="OR location LIKE">
+						'%'||#{location}||'%'
+					</foreach>
+				</if>
+				<if test="category != null and category != ''">
+					<foreach open="AND category IN (" collection="category"
+						item="category" separator="," close=")">
+						#{category}
+					</foreach>
+				</if>
+				<if test="search != null and search !=''">
+					AND title LIKE '%'||#{search}||'%'
+				</if>
+				<if test="price != null and price != 0">
+					AND price <![CDATA[<=]]>
+					#{price }
+				</if>
+				<if test="dong != null and dong !=''">
+					OR location LIKE '%'||#{dong}||'%'
+				</if>
+			</trim>
+		</where>
+		) A
+		ORDER BY reg_no ASC
+		) R
+		<where>rnum BETWEEN #{startNo } AND #{endNo }</where>
+	</select>
+
+	<select id="selectCntAll" parameterType="web.util.Paging"
+		resultType="int">
+		SELECT count(*) FROM (
+		<include refid="selectBoard" />
+		<include refid="whereTitle" />
+		) CNT
+	</select>
+
+	<insert id="insertProduct" parameterType="web.dto.Product">
+
+		<selectKey order="BEFORE" resultType="int"
+			keyProperty="regNo">
+			SELECT Product_SEQ.nextval FROM dual
+		</selectKey>
+
+		INSERT INTO PRODUCT
+		(reg_no,trade_class,CATEGORY,PRICE,TITLE,CONTENT,QUANTITY,USER_EMAIL,LOCATION,REG_DATE)
+		VALUES(#{regNo},#{tradeClass},#{category},#{price},#{title},
+		#{content},#{quantity},#{userEmail},#{location},#{regDate})
+
+
+	</insert>
+
+	<update id="updateHit" parameterType="web.dto.Product">
+		UPDATE product
+		SET hit = hit
+		+ 1
+		WHERE reg_no = #{regNo }
+	</update>
+
+
+	<!-- 상세페이지 -->
+	<select id="selectBoardByBoardNo"
+		parameterType="web.dto.Product" resultMap="Product">
+		<include refid="selectBoardWithRecommend" />
+		WHERE reg_no = #{regNo }
+	</select>
+
+
+	<delete id="delete" parameterType="web.dto.Product">
+		DELETE Product
+		WHERE reg_no =
+		#{regNo }
+
+	</delete>
+
+	<select id="selectFile" parameterType="Product"
+		resultMap="FileTest">
+		select file_path, stored_name from product p , tb_file f
+		where p.reg_no = f.reg_no
+		and p.reg_no = #{regNo }
+	</select>
+
+
+	<update id="update" parameterType="web.dto.Product">
+
+		UPDATE product
+		SET price = #{price}
+		, trade_class = #{tradeClass}
+		, category =
+		#{category}
+		, quantity = #{quantity}
+		,title = #{title}
+		,content =
+		#{content}
+		WHERE reg_no = #{regNo}
+	</update>
+	
+	<select id="searchDong" parameterType="Member" resultType="Member">
+		SELECT dong FROM MEMBER WHERE id = #{id}
+	
+	</select>
+</mapper>

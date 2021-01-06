@@ -1,0 +1,8 @@
+DROP TABLE member;
+CREATE TABLE member (
+    id VARCHAR2(100), --아이디
+	pw VARCHAR2(100) NOT NULL, --비밀번호
+	nick VARCHAR2(100) NOT NULL --닉네임
+);
+ALTER TABLE member DROP CONSTRAINT member_pk;
+ALTER TABLE member ADD CONSTRAINT member_pk PRIMARY KEY (id);

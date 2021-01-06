@@ -1,0 +1,14 @@
+
+ + 요청시작 화면 - 목록화면에서 제목 클릭하면 이동
+
+ + BoardController - /board/view [GET]
+  - 요청파라미터 : 글 번호
+
+ + BoardService
+	public Board view(int boardno); //매개변수 타입 바꿔도 됨
+
+ + BoardDao
+	public Board select(int boardno);
+	public Board hit(int boardno);
+
+ + View : /board/view.jsp

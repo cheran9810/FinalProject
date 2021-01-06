@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="web.dao.face.HomeDao">
+
+	<select id="selectList" resultType="HashMap">
+	        SELECT * FROM (
+    SELECT rownum rnum, PROD.* FROM (
+        SELECT 
+            P.reg_no, price, title
+            , location, stored_name
+            , ( SELECT count(*) FROM commenttb C WHERE P.reg_no = C.regno ) cnt
+        FROM product P, (
+            SELECT * FROM tb_file
+            WHERE (file_no, reg_no) IN (
+                SELECT min(file_no), reg_no
+                FROM tb_file
+                GROUP BY reg_no
+           	 )
+       	 ) F
+       		 WHERE P.reg_no = F.reg_no
+       		 AND( f.file_kind = 'jpg'
+       		 OR f.file_kind = 'png'
+       		 OR f.file_kind = 'jpeg')
+        	ORDER BY cnt DESC
+    	) PROD 
+	) R
+	WHERE rnum BETWEEN 1 AND 8
+	</select>
+
+
+</mapper>

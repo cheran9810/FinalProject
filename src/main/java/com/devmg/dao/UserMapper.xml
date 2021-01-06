@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+  <mapper namespace="com.devmg.dao.UserDao">
+  <select id="selectAllUser" resultType="com.devmg.dto.Member">
+  select * from member
+  </select>
+  
+  
+  
+  <select id="selectAllMessage" parameterType="com.devmg.dto.Chat" resultType="com.devmg.dto.Chat">
+  select * from(select sender,reciever,message,send_time,b.nick as sender_nick from chat_tb a,member b 
+  where a.sender=b.id and (delete_id='none' OR delete_id!=#{sender} and delete_id!='none' and delete_index=1)) a where a.sender=#{reciever} and a.reciever=#{sender}
+or a.sender=#{sender} and a.reciever=#{reciever}
+order by send_time
+ 
+
+  </select>
+  
+  <select id="selectNickByEmail" parameterType="com.devmg.dto.Member" resultType="com.devmg.dto.Member">
+  
+     select * from member where id= #{id}
+  </select>
+  
+  <select id="selectChattingList" parameterType="com.devmg.dto.Chat" resultType="com.devmg.dto.Chat">
+
+<!--           select b.sender,b.reciever,b.dd as send_time ,message ,nick as receiver_nick,sender_nick,total-checked as unchecked from(  -->
+<!--   	select a.*,nick as sender_nick from  -->
+<!--     (select a.*,b.message from (select sender,reciever, max(send_time)as dd ,sum(checked) as checked ,count(message)as total from chat_tb where sender=#{sender} OR reciever=#{sender} group by sender,reciever) a ,chat_tb b -->
+<!--     where a.dd=b.send_time) a,member where id=a.sender) b,member where member.id=b.reciever order by send_time desc -->
+              select b.sender,b.reciever,b.dd as send_time ,message ,nick as receiver_nick,sender_nick,total-checked as unchecked from( 
+  	select a.*,nick as sender_nick from 
+    (select a.*,b.message from (select sender,reciever, max(send_time)as dd ,sum(checked) as checked ,count(message)as total from chat_tb where (sender=#{sender} OR reciever=#{sender}) and (delete_id='none'  OR delete_id!=#{sender} and delete_id!='none' and delete_index=1) group by sender,reciever) a ,chat_tb b
+    where a.dd=b.send_time) a,member where id=a.sender) b,member where member.id=b.reciever order by send_time desc
+  </select>
+  
+  
+  <insert id="insertMessage"  parameterType="com.devmg.dto.Chat">
+  insert into chat_tb (sender,reciever,message,send_time) 
+values (#{sender},#{reciever},#{message},#{send_time})
+  
+  
+  </insert>
+  
+  <update id="updateChecked" parameterType="com.devmg.dto.Chat">
+  UPDATE  CHAT_TB SET CHECKED='1' WHERE SENDER=#{reciever} AND RECIEVER=#{sender}
+  
+  
+  </update>
+  <update id="DeleteChatlist" parameterType="com.devmg.dto.Chat">
+
+  update chat_tb set delete_id=#{sender} where sender=#{sender} and reciever=#{reciever}  OR sender=#{reciever} and reciever=#{sender}
+  
+
+  </update>
+  <update id="DeleteChatlistIndex" parameterType="com.devmg.dto.Chat">
+  
+  update chat_tb set delete_index=delete_index+1 where sender=#{sender} and reciever=#{reciever}  OR sender=#{reciever} and reciever=#{sender}
+  
+  </update>
+  
+  
+  </mapper>
+  

@@ -1,0 +1,10 @@
+
+	TABLE : member
+
+	id VARCHAR2(100) --아이디
+	pw VARCHAR2(100) --비밀번호
+	nick VARCHAR2(100) --닉네임
+
+	PK : id
+	pw : NOT NULL
+	nick : NOT NULL

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="web.dao.face.CommentDao">
+
+	<select id="selectComment" parameterType="Product" resultType="Comment">
+		SELECT * FROM (
+			SELECT rownum rnum, B.* FROM (
+				SELECT
+					commentno
+					, regno
+					, userid
+					, content
+					, write_date as writedate
+					, secretReply
+				FROM commentTb
+				WHERE regno = #{regNo}
+				ORDER BY write_date
+			) B
+		) ORDER BY rnum
+	</select>
+	
+	<insert id="insertComment" parameterType="Comment">
+		INSERT INTO commentTB (commentno, regno, userid, content, secretReply )
+		VALUES ( commentTb_seq.nextval, #{regNo}, #{userid}, #{content}, #{secretReply } )
+	</insert>
+
+	<update id="updateComment" parameterType="Comment">
+		UPDATE commentTB
+		SET content = #{content}
+		WHERE commentno = #{commentNo}
+	
+	</update>
+	
+	<delete id="deleteComment" parameterType="Comment">
+		DELETE commentTB
+		WHERE commentno = #{commentNo}
+	</delete>
+
+	<select id="countComment" parameterType="Comment" resultType="int">
+		SELECT COUNT(*) FROM commenttb WHERE commentno=#{commentNo}
+	</select>
+
+</mapper>

@@ -1,0 +1,13 @@
+ + 요청시작 JSP (/board/write) : #btnWrite - POST
+	클릭하면 /board/write 로 이동
+
+ + Controller : BoardController - /board/write
+	글쓰기 form에서 받은 데이터를 DB에 저장
+
+ + Service : BoardService - write(board)
+
+ + Dao : BoardDao - write(board)
+
+ + SQL : INSERT
+
+ + View : "redirect:/board/list"

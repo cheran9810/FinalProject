@@ -1,0 +1,13 @@
+ + 요청시작 JSP (/board/view) : 삭제 버튼 클릭 - #btnDelete
+	클릭하면 /board/delete 로 이동
+
+ + Controller : BoardController - /board/delete - GET
+	parameter - boardno
+
+ + Service : BoardService - Board boardDelete(Board deleteBoard);
+	boardno에 해당하는 Board를 삭제하기
+
+ + Dao : BoardDao - void deleteBoard(Board deleteBoard);
+	boardno에 해당하는 Board 삭제
+
+ + View : redirect:/board/list

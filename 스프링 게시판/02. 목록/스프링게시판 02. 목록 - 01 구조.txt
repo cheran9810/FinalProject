@@ -1,0 +1,16 @@
+
+ + 게시글 목록보기 (페이징 처리)
+
+ + BoardController - /board/list [GET]
+  - 요청파라미터 : 페이징 번호
+
+ + BoardService
+	public List list(Paging paging);
+
+ + BoardDao
+	public List selectAll(Paging paging);
+
+ + DTO
+	Board.java
+
+ + VIEW : /board/list.jsp

@@ -1,0 +1,27 @@
+DROP TABLE boardfile;
+DROP TABLE board;
+
+-- 게시판 테이블
+CREATE TABLE board (
+    boardno_no NUMBER --글번호
+    , title VARCHAR2(500) --제목
+    , content VARCHAR2(4000) --본문
+    , writer_id VARCHAR2(100) --작성자 아이디
+    , writer_nick VARCHAR2(100) --작성자 닉네임
+    , hit NUMBER DEFAULT 0 --조회수
+    , write_date DATE DEFAULT sysdate --최초작성일
+);
+
+-- 게시판 테이블 기본키 삭제
+ALTER TABLE board
+DROP CONSTRAINT board_pk;
+
+-- 게시판 테이블 기본키 추가
+ALTER TABLE board
+ADD CONSTRAINT board_pk PRIMARY KEY (board_no);
+
+-- 게시판 테이블 시퀀스
+DROP SEQUENCE board_seq;
+CREATE SEQUENCE board_seq;
+
+SELECT * FROM board;

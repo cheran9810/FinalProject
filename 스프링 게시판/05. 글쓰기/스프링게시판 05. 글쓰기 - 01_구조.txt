@@ -1,0 +1,11 @@
+ + 요청시작 JSP (/board/list) : #btnWrite - GET
+	클릭하면 /board/write 로 이동
+
+ + Controller : BoardController - /board/write
+  - 작성자 세션정보 관리 주의
+
+ + View : /board/write.jsp
+  - 글쓰기 페이지
+	입력 데이터 Form
+
+  - 글쓰기(or 작성 or 업로드) 버튼 - #btnWrite

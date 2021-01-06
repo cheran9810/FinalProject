@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace = "file.dao.face.FileDao">
+
+	<resultMap type="file.dto.Filetest" id="Filetest">
+		<result column="origin_name" property="originName"/>
+		<result column="stored_name" property="storedName"/>
+		
+	</resultMap>
+	
+	
+	
+	<insert id="insertFile" parameterType="file.dto.Filetest">
+	
+	
+	<selectKey order="BEFORE" resultType="int" keyProperty="reg_no">
+<!-- 가라로함.. 사람여러명한꺼번에붙으면 오류날듯 -->
+		
+        select  last_number-1
+      from  user_sequences
+      where sequence_name = 'PRODUCT_SEQ'
+ 	</selectKey>
+		INSERT INTO tb_file(reg_no,file_kind ,origin_name,stored_name,file_path)
+		VALUES(#{reg_no},#{fileKind},#{originName},#{storedName},#{filePath})
+	</insert>
+	
+	
+</mapper>

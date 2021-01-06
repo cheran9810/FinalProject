@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="web.dao.face.MemberDao">
+
+<resultMap type="web.dto.Question" id="Question">
+		<id property="qPk" column="q_pk" />
+		<result property="qTitle" column="q_title" />
+		<result property="qContent" column="q_content" />
+		<result property="qCategory" column="q_category" />
+		<result property="userEmail" column="user_email" />
+		<result property="qDate" column="q_date"/>
+	</resultMap>
+	
+	<resultMap type="web.dto.Answer" id="Answer">
+		<id property="aPk" column="a_pk" />
+		<result property="aTitle" column="a_title" />
+		<result property="aContent" column="a_content" />
+		<result property="qPk" column="q_pk" />
+	</resultMap>
+	<select id="join" parameterType="web.dto.Member">
+		INSERT INTO member ( id, pw, nick, sido, dong, pw2 ) <!-- #loc 뺌 -->
+		VALUES ( #{id }, #{pw }, #{nick }, #{sido}, #{dong}, #{pw2} )
+	</select>
+
+	<select id="selectByUserid" parameterType="web.dto.Member" resultType="int">
+		SELECT count(*) FROM member
+		WHERE id = #{id }
+	</select>
+
+	<select id="login" parameterType="web.dto.Member" resultType="int">
+		SELECT count(*) FROM member
+		WHERE id = #{id }
+			AND pw = #{pw }
+	</select>
+
+	<select id="getUsernick" parameterType="web.dto.Member" resultType="String">
+		SELECT nick FROM member
+		WHERE id = #{id }	
+	</select>
+	
+	<select id="selectOneMember" parameterType="String" resultType="web.dto.Member">
+		select
+			*
+		from
+			member
+		where
+			id = #{email}
+	</select>
+	<select id="selectCntByID" parameterType="String"
+		resultType="int">
+		SELECT count(*) FROM (
+		select * from question
+		where
+		user_email = #{userEmail }
+		)
+	</select>
+
+	<select id="myQaList" parameterType="Map" resultType="Map">
+		SELECT *
+		FROM
+		(
+		SELECT rownum AS rnum, B.* FROM (
+		SELECT q.q_pk, q.user_email,
+		q.q_title, q.q_category, a.a_pk, a.a_title,
+		a.a_content,q.q_date,a.a_date FROM question
+		q, answer a
+		WHERE q.q_pk = a.q_pk (+) AND q.user_email = #{userEmail }
+		ORDER BY q.q_pk ASC
+		)B
+		)R
+		WHERE rnum BETWEEN #{startNo } AND #{endNo }
+	</select>
+
+	<insert id="qaWrite" parameterType="web.dto.Question">
+		INSERT INTO question
+		(user_email ,q_title, q_content, q_category)
+		VALUES (#{userEmail },
+		#{qTitle },#{qContent }, #{qCategory })
+	</insert>
+
+	<select id="memberQAByQpk"
+		parameterType="web.dto.Question" resultMap="Question">
+		SELECT * FROM
+		question
+		WHERE q_pk = #{qPk }
+	</select>
+
+	<select id="memberQAByApk" parameterType="web.dto.Answer" resultMap="Answer">
+		SELECT * FROM
+		answer
+		WHERE a_pk = #{aPk }
+	</select>
+
+	<update id="qaUpdate" parameterType="web.dto.Question">
+		UPDATE question
+		SET q_title =
+		#{qTitle}
+		, q_content = #{qContent}
+		, q_category = #{qCategory}
+		WHERE
+		q_pk = #{qPk}
+	</update>
+
+	<delete id="qaDelete" parameterType="web.dto.Question">
+		DELETE question
+		WHERE q_pk =
+		#{qPk }
+	</delete>
+</mapper>

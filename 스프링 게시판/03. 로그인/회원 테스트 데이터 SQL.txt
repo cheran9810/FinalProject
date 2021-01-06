@@ -1,0 +1,7 @@
+DELETE member;
+INSERT INTO member ( id, pw, nick ) VALUES ( 'a', 'b', 'c' );
+INSERT INTO member ( id, pw, nick ) VALUES ( '1', '2', '3' );
+INSERT INTO member ( id, pw, nick ) VALUES ( 'r', 'rr', 'rrr' );
+COMMIT;
+
+SELECT * FROM member;

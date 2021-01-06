@@ -1,0 +1,20 @@
+ + 로그인 기능
+ + MemberController
+  - /member/login
+  - /member/logout
+  - /member/join
+  - /member/main
+
+ + MemberService
+
+ + MemberDao
+
+ + Dto : Member
+  - String id;
+  - String pw;
+  - String nick;
+
+ + View
+  - /member/main.jsp
+  - /member/login.jsp
+  - /member/join.jsp

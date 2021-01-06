@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="web.dao.face.AdminDao">
+
+	<resultMap type="web.dto.Question" id="Question">
+		<id property="qPk" column="q_pk" />
+		<result property="qTitle" column="q_title" />
+		<result property="qContent" column="q_content" />
+		<result property="qCategory" column="q_category" />
+		<result property="userEmail" column="user_email" />
+	</resultMap>
+
+	<select id="selectQACnt" resultType="int">
+		SELECT COUNT(*) FROM
+		question
+	</select>
+
+	<select id="selectQAList" parameterType="web.util.Paging"
+		resultType="hashmap">
+		SELECT * FROM
+		(
+		SELECT rownum AS rnum, B.* FROM (
+		SELECT
+		q.q_pk, q.user_email, q.q_title, q.q_category, a.a_pk, a.a_title,
+		a.a_content, q.q_date, a.a_date FROM question q, answer a
+		WHERE q.q_pk = a.q_pk (+)
+		ORDER BY
+		a.a_pk DESC, q.q_pk
+		)B
+		)R
+		WHERE rnum BETWEEN #{startNo } AND #{endNo }
+	</select>
+
+	<insert id="insertAnswer" parameterType="web.dto.Answer">
+		INSERT INTO answer
+		(a_title, a_content, q_pk)
+		VALUES (#{aTitle }, #{aContent }, #{qPk })
+	</insert>
+
+	<select id="selectWriteCheck" parameterType="web.dto.Answer"
+		resultType="int">
+		SELECT COUNT(*) FROM question q, answer a
+		WHERE q.q_pk = a.q_pk
+		and q.q_pk = #{qPk}
+	</select>
+
+	<update id="updateAnswer" parameterType="web.dto.Answer">
+		UPDATE answer
+		SET a_title
+		= #{aTitle }
+		, a_content = #{aContent }
+		WHERE a_pk = #{aPk }
+	</update>
+
+	<delete id="deleteAnswer" parameterType="web.dto.Answer">
+		DELETE answer
+		WHERE a_pk
+		= #{aPk }
+	</delete>
+
+	<select id="selectBoardReportCnt" resultType="int">
+		select count(*) cnt
+		from (select p.reg_no from product p, rboard r
+		where p.reg_no = r.regno
+		group by p.reg_no)
+	</select>
+
+	<select id="selectBoardReportList"
+		parameterType="web.util.Paging" resultType="hashmap">
+		select * FROM(select rownum
+		rnum, x.* from(select p.reg_no, p.title, p.user_email, cnt.cnt from
+		product p, rboard r,(select regno, count(*) cnt from rboard
+		group by
+		regno) cnt
+		where p.reg_no = r.regno
+		and p.reg_no = cnt.regno
+		group by
+		p.reg_no, p.title, p.user_email, cnt.cnt
+		order by p.reg_no) x)
+		where
+		rnum between
+		#{startNo } and #{endNo }
+	</select>
+
+	<select id="selectCommentReportCnt" resultType="int">
+		select count(*)
+		from(select c.commentno from commenttb c, report r
+		where c.commentno = r.commentno
+		group by c.commentno)
+
+	</select>
+
+	<select id="selectCommentReportList"
+		parameterType="web.util.Paging" resultType="hashmap">
+		select * from(select rownum
+		rnum, x.* from(select
+		c.commentno, c.userid,
+		c.content, cnt.cnt from
+		commenttb c, report
+		r,(select commentno,
+		count(*) cnt from report
+		group by commentno) cnt
+		where c.commentno = r.commentno
+		and c.commentno
+		= cnt.commentno
+		group by
+		c.commentno, c.userid, c.content, cnt.cnt
+		order
+		by c.commentno) x)
+		where rnum between #{startNo } and #{endNo }
+	</select>
+	
+	<delete id="BoardDeleteByRegNo" parameterType="web.dto.Product">
+		DELETE Product
+		WHERE reg_no =
+		#{regNo }
+	</delete>
+
+	<delete id="CommentDeleteByCommentNo" parameterType="web.dto.Comment">
+		DELETE commentTB
+		WHERE commentno = #{commentNo}
+	</delete>
+	
+	<delete id="memberDeleteById" parameterType="web.dto.Member">
+		DELETE MEMBER
+		WHERE id = #{id }
+	</delete>
+	
+	<select id="countMember" parameterType="web.dto.Member" resultType="int">
+		SELECT count(*) cnt FROM MEMBER
+		WHERE id = #{id }
+	</select>
+</mapper>

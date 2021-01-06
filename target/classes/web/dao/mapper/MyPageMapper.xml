@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+  <mapper namespace="web.dao.face.MyPageDao" >
+  	
+  	<sql id = "selectProduct">
+  		SELECT * FROM PRODUCT
+		WHERE user_Email =  #{id }
+  	</sql>
+  	
+  	<sql id = "selectComment">
+  		SELECT * from COMMENTTB
+		WHERE userid = #{id }
+  	</sql>
+  	
+  	<sql id="search">
+		<if test="search != null and !''.equals(search)">
+		AND title LIKE '%'||#{search}||'%'
+		OR content Like '%'||#{search}||'%'
+		</if>
+	</sql> 
+	
+	<sql id="commentsearch">
+		<if test="search != null and !''.equals(search)">
+		AND title LIKE '%'||#{search}||'%'
+		OR content LIKE '%'||#{search}||'%'
+		</if>
+	</sql> 
+	
+	<sql id="selectRownum">
+		SELECT
+			rownum rnum, B.*
+		FROM (
+			<include refid="selectProduct" />
+			<include refid = "search"/>
+			ORDER BY reg_no ASC
+		) B
+		ORDER BY rnum
+	</sql>
+	
+	<sql id="selectRownumCmt">
+		SELECT
+			rownum rnum, B.*
+		FROM (
+			<include refid="selectComment" />
+			<include refid = "commentsearch"/>
+			ORDER BY reg_no ASC
+		) B
+		ORDER BY rnum
+	</sql>
+	
+  	<select id = "selectById" parameterType = "String" resultType = "HashMap">
+  		SELECT * FROM Member
+  		WHERE id = #{id }
+  	</select>
+  	
+  	<select id = "selectMyRegById" parameterType = "web.util.Paging" resultType = "HashMap">
+  		SELECT * FROM ( 
+			<include refid="selectRownum" />	
+		) R
+		<where>
+			rnum BETWEEN #{startNo } AND #{endNo }
+		</where>
+  	</select>
+
+	<select id="selectCntAll" parameterType="web.util.Paging" resultType="int">
+		SELECT count(*) FROM (
+			<include refid="selectProduct" />
+		) CNT 
+	</select>	
+	
+  	<select id = "selectMyCommentById" parameterType = "web.util.Paging" resultType = "HashMap">
+  		SELECT * FROM(select rownum rnum , R.* FROM(select c.commentno, c.content, c.regno, c.write_date, p.title, p.category from commenttb c , product p
+		where c.regno = p.reg_no and c.userid = #{id }) R
+		) F
+		WHERE rnum BETWEEN #{startNo } AND #{endNo }
+		AND title LIKE '%'||#{search}||'%'
+		OR content LIKE '%'||#{search}||'%'
+		ORDER BY WRITE_DATE ASC
+  	</select>
+  	
+  	<select id="selectCntCmt" parameterType="web.util.Paging" resultType="int">
+		SELECT count(*) FROM (
+			<include refid="selectComment" />
+		) CNT
+	</select>	
+  	
+  	<update id = "updateMember" parameterType = "web.dto.Member">
+  		UPDATE MEMBER
+  		SET pw = #{pw}, nick = #{nick}, sido = #{sido}, dong = #{dong}
+  		WHERE id = #{id }
+  	</update>
+  	
+  	<delete id = "deletePost" parameterType = "HashMap">
+  		DELETE FROM PRODUCT
+  		<if test="postArr != null and !''.equals(postArr)">
+  		WHERE reg_no IN
+  			<foreach collection="postArr" item = "reg_no"
+  			open = "(" close=")" separator=",">
+  			#{reg_no }
+  			</foreach>
+  		</if>
+  	</delete>
+  	
+  	<delete id = "deleteCmt" parameterType = "HashMap">
+  		DELETE FROM COMMENTTB
+  		<if test="postArr != null and !''.equals(postArr)">
+  		WHERE commentno IN
+  			<foreach collection="postArr" item = "commentno"
+  			open = "(" close=")" separator=",">
+  			#{commentno }	
+  			</foreach>
+  		</if>
+  	</delete>
+  	
+  	<select id = "selectScrap" parameterType = "String" resultType = "HashMap">
+ 	 SELECT 
+            P.reg_no, price, title
+            , location, stored_name, reg_date, P.user_email  
+            , s.userid
+        FROM Product P, recommend s,(
+            SELECT * FROM tb_file
+            WHERE (file_no, reg_no) IN (
+                SELECT min(file_no), reg_no
+                FROM tb_file
+                GROUP BY reg_no
+           	 )
+       	 ) F
+       		 WHERE P.reg_no = F.reg_no
+             and p.reg_no = s.regno
+       		 AND ( f.file_kind = 'jpg'
+       		 OR f.file_kind = 'png'
+       		 OR f.file_kind = 'jpeg')
+       		 
+  			and s.userid = #{id }
+  	</select>
+  	
+  	<delete id = "deleteScrap" parameterType = "HashMap">
+  		DELETE FROM recommend
+  		<if test="postArr != null and !''.equals(postArr)">
+  		WHERE regno IN
+  			<foreach collection="postArr" item = "reg_no"
+  			open = "(" close=")" separator=",">
+  			#{reg_no }
+  			</foreach>
+  		</if>
+  	</delete>
+  	
+  </mapper>

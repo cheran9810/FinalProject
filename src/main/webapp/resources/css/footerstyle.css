@@ -1,0 +1,31 @@
+@charset "UTF-8";
+
+#footer{font-family: 'Nanum Gothic', AppleSDGothicNeo-Regular,'Malgun Gothic','맑은 고딕',dotum,'돋움',sans-serif; color: #ADB5BD; font-size: 13px; line-height: 1.5;}
+
+/* #footer {border-top: 1px solid #dbdbdb; }  */
+
+address{ font-family: 'Nanum Gothic', AppleSDGothicNeo-Regular,'Malgun Gothic','맑은 고딕',dotum,'돋움',sans-serif; color: #ADB5BD; font-size: 13px; line-height: 1.5; font-style:normal;	}
+
+.footer {text-align: center; padding: 30px 50px; background: #495057;} 
+.footer li {position: relative; display: inline; padding: 0 7px 0 10px; white-space: nowrap;}
+.footer li:first-child:before {width: 0;}
+.footer address {padding-top: 15px;}
+.footer  a:hover {text-decoration: none; color: #ADB5BD;}
+.footer  a:link {text-decoration: none; color: #ADB5BD;}
+.footer  a:visited {text-decoration: none; color: #ADB5BD;}
+
+.footer_sns {
+	display:flex;
+	margin-left: 45%;
+}
+
+.footer_sns div {
+	margin: 10px;
+}
+
+.scrollTop{
+	
+	margin-left: 90%;
+    margin-bottom: 20px;
+}
+
