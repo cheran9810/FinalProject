@@ -167,6 +167,7 @@ public class MemberController {
 		} else {
 			logger.info("map = {}", map);
 			session.setAttribute("login", member);
+			session.setAttribute("id",map.get("id"));
 			return "redirect:/"; // 첫화면
 		}
 
@@ -211,6 +212,7 @@ public class MemberController {
 			// 회원가입 되어 있는 경우
 			logger.info("map = {}", map);
 			session.setAttribute("login", member);
+			session.setAttribute("id",map.get("id"));
 			return "redirect:/"; // 첫화면
 
 		}
